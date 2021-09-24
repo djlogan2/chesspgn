@@ -1,0 +1,29 @@
+{
+  "name": "@chessclub.com/chesspgn",
+  "version": "1.0.0",
+  "description": "Import and export PGN games",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/djlogan2/chesspgn.git"
+  },
+  "keywords": ["pgn", "import", "export", "chess"],
+  "author": "David Logan",
+  "license": "ISC",
+  "bugs": "https://github.com/djlogan2/chesspgn/issues",
+  "homepage": "https://github.com/djlogan2/chesspgn",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2",
+    "mocha": "^9.1.1"
+  },
+  "peerDependencies": {
+    "date-and-time": ">=2.0.0",
+    "moo": ">=0.5.1"
+  }
+}
