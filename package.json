@@ -4,13 +4,16 @@
   "description": "Import and export PGN games",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "publish":"npm publish --access public"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/djlogan2/chesspgn.git"
   },
   "keywords": [
+    "icc",
+    "chessclub.com",
     "pgn",
     "import",
     "export",
