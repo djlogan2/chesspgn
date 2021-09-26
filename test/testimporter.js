@@ -199,9 +199,12 @@ describe('PGN Import', () => {
     const pgnstream = new Readable();
     pgnstream.push(pgn1);
     pgnstream.push(null);
+    let count = 0;
     importer.import(pgnstream)
-      .events.on('end', () => {
-        chai.assert.equal(importer.gamelist.length, 2);
+      .events.on('gamesready', (gamelist) => {
+        count += gamelist.length;
+      }).on('end', () => {
+        chai.assert.equal(count, 2);
         done();
       });
   });

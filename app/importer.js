@@ -1,5 +1,4 @@
 const moo = require('moo');
-const date = require('date-and-time');
 const EventEmitter = require('events');
 
 class Importer {
@@ -73,7 +72,10 @@ class Importer {
           // delete "this.gamelist", and continue.
           //
           if (this.gamelist) {
-            this.events.emit('gamesready', this.gamelist);
+            if(this.events.listeners("gamesready")) {
+              this.events.emit('gamesready', this.gamelist);
+              this.gamelist = [];
+            }
           }
           chunk = stream.read();
         }
@@ -82,7 +84,7 @@ class Importer {
         if (!!saveBuffer && saveBuffer.length) {
           this.feed(saveBuffer.toString('utf8'));
           if (this.gameobject) this.gamelist.push(this.gameobject);
-          if (this.gamelist) {
+          if (!!this.gamelist) {
             this.events.emit('gamesready', this.gamelist);
           }
         }
@@ -140,7 +142,7 @@ class Importer {
     this.pushdebug('game', token.type, token.text);
     if (token.type === 'LBRACKET') {
       this.state = this.tagname;
-      this.gameobject = { tags: {}, variations: { movelist: [{}] } };
+      this.gameobject = { tags: {}, movelist: [{}] };
       this.cmi = 0;
     } else this.error("Expecting start of game (that is, a left bracket '[')", token);
   }
@@ -217,21 +219,21 @@ class Importer {
     this.pushdebug('san', token.type, token.text);
     if (token.type === 'PERIOD' || token.type === 'DOTDOTDOT') return; // Skip "1." "1..." "1. ..." "..." etc.
     if (token.type !== 'SAN') this.error('Expecting periods or a SAN move', token);
-    if (!this.gameobject.variations.movelist[this.cmi].variations) {
-      this.gameobject.variations.movelist[this.cmi].variations = [];
+    if (!this.gameobject.movelist[this.cmi].variations) {
+      this.gameobject.movelist[this.cmi].variations = [];
     }
-    this.gameobject.variations.movelist[this.cmi].variations.push(
-      this.gameobject.variations.movelist.length,
+    this.gameobject.movelist[this.cmi].variations.push(
+      this.gameobject.movelist.length,
     );
-    this.gameobject.variations.movelist.push({ move: token.value, prev: this.cmi });
-    this.cmi = this.gameobject.variations.movelist.length - 1;
+    this.gameobject.movelist.push({ move: token.value, prev: this.cmi });
+    this.cmi = this.gameobject.movelist.length - 1;
     this.state = this.nag;
   }
 
   nag(token) {
     this.pushdebug('nag', token.type, token.text);
     if (token.type === 'NAG') {
-      this.gameobject.variations.movelist[this.cmi].nag = token.value;
+      this.gameobject.movelist[this.cmi].nag = token.value;
     } else this.comment(token);
   }
 
@@ -239,7 +241,7 @@ class Importer {
     this.pushdebug('comment', token.type, token.text);
     if (token.type === 'LBRACE' || token.type === 'SEMICOLON') {
       this.state = this.commenttext;
-      this.gameobject.variations.movelist[this.cmi].comment = '';
+      this.gameobject.movelist[this.cmi].comment = '';
     } else this.recursive(token);
   }
 
@@ -247,17 +249,17 @@ class Importer {
     this.pushdebug('commenttext', token.type, token.text);
     switch (token.type) {
       case 'C1NL':
-        this.gameobject.variations.movelist[this.cmi].comment += token.value;
+        this.gameobject.movelist[this.cmi].comment += token.value;
         return;
       case 'C1':
-        this.gameobject.variations.movelist[this.cmi].comment += token.value.substring(
+        this.gameobject.movelist[this.cmi].comment += token.value.substring(
           0,
           token.value.length - 1,
         );
         this.state = this.nag;
         return;
       case 'C2':
-        this.gameobject.variations.movelist[this.cmi].comment += token.value.replace(/\r?\n/, '');
+        this.gameobject.movelist[this.cmi].comment += token.value.replace(/\r?\n/, '');
         this.state = this.nag;
         return;
       default:
@@ -272,7 +274,7 @@ class Importer {
         this.state = this.variationstart;
         if (this.nested_variations === undefined) this.nested_variations = [];
         this.nested_variations.push(this.cmi);
-        this.cmi = this.gameobject.variations.movelist[this.cmi].prev;
+        this.cmi = this.gameobject.movelist[this.cmi].prev;
         break;
       case 'RPAREN':
         this.cmi = this.nested_variations.pop();
