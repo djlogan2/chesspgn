@@ -293,64 +293,7 @@ class Importer {
   }
 
   savegame(result) {
-    let newtime;
-    let newdate;
     this.pushdebug('savegame', null, result);
-    this.gameobject.result = result;
-    this.gameobject.white = { name: '?', rating: 1600 };
-    this.gameobject.black = { name: '?', rating: 1600 };
-
-    for (const tag in Object.keys(this.gameobject.tags)) {
-      switch (tag) {
-        case 'White':
-          this.gameobject.white.name = this.gameobject.tags[tag];
-          delete this.gameobject.tags[tag];
-          break;
-        case 'Black':
-          this.gameobject.black.name = this.gameobject.tags[tag];
-          delete this.gameobject.tags[tag];
-          break;
-        case 'Result':
-          this.gameobject.result = this.gameobject.tags[tag];
-          delete this.gameobject.tags[tag];
-          break;
-        case 'WhiteUSCF':
-        case 'WhiteElo':
-          this.gameobject.white.rating = parseInt(this.gameobject.tags[tag], 10);
-          delete this.gameobject.tags[tag];
-          break;
-        case 'BlackUSCF':
-        case 'BlackElo':
-          this.gameobject.black.rating = parseInt(this.gameobject.tags[tag], 10);
-          delete this.gameobject.tags[tag];
-          break;
-        case 'Date':
-          newdate = date.parse(this.gameobject.tags[tag], 'YYYY.DD.MM');
-          delete this.gameobject.tags[tag];
-          if (!this.gameobject.startTime) this.gameobject.startTime = newdate;
-          else {
-            this.gameobject.startTime.setFullYear(newdate.getFullYear());
-            this.gameobject.setMonth(newdate.getMonth());
-            this.gameobject.setDate(newdate.getDate());
-          }
-          break;
-        case 'Time':
-          newtime = date.parse(this.gameobject.tags[tag], 'hh.mm.ss');
-          delete this.gameobject.tags[tag];
-          if (!this.gameobject.startTime) {
-            this.gameobject.startTime = newtime;
-          } else {
-            this.gameobject.startTime.setHours(newtime.getHours());
-            this.gameobject.startTime.setMinutes(newtime.getMinutes());
-            this.gameobject.startTime.setSeconds(newtime.getSeconds());
-            this.gameobject.startTime.setMilliseconds(0);
-          }
-          break;
-        default:
-          break;
-      }
-    }
-
     if (!this.gamelist) this.gamelist = [];
     this.gamelist.push(this.gameobject);
     delete this.gameobject;

@@ -23,7 +23,6 @@
     "mocha": "^9.1.1"
   },
   "peerDependencies": {
-    "date-and-time": ">=2.0.0",
     "moo": ">=0.5.1"
   }
 }
