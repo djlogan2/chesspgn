@@ -73,14 +73,14 @@ function buildPgnFromMovelist(movelist) {
       idx2 === -1 ? idxmax : idx2,
       idx3 === -1 ? idxmax : idx3,
     );
-    reformatted += `${longString.substr(0, idx)}\n`;
-    longString = longString.substring(idx);
+    reformatted += `${longString.substr(0, idx).trim()}\n`;
+    longString = longString.substring(idx).trim();
   }
   reformatted += longString;
   return reformatted;
 }
 
-function exportPGN(tags, movelist) {
+function exportPGN(tags, movelist, textresult) {
   let pgn = '';
   const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
   sevenTags.forEach((tag) => {
@@ -97,12 +97,13 @@ function exportPGN(tags, movelist) {
     if (sevenTags.indexOf(tag) === -1) pgn += `[${tag} "${tags[tag]}"]\n`;
   }
 
-  pgn += '\n';
+  if (!!movelist && movelist.length > 1) pgn += '\n';
+
   pgn += buildPgnFromMovelist(movelist);
-  const lastchar = pgn.charAt(pgn.length - 1);
-  const sp = /\s/.test(lastchar) ? '' : ' ';
-  if (tags && tags.Result) pgn += `${sp}${tags.Result}`;
-  else pgn += `${sp}*`;
+  if (pgn) pgn += '\n';
+  if (textresult) pgn += `{${textresult}}\n`;
+  if (tags && tags.Result) pgn += tags.Result;
+  else pgn += '*';
   return pgn;
 }
 
