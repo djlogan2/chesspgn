@@ -1,11 +1,10 @@
 {
   "name": "@chessclub.com/chesspgn",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Import and export PGN games with variations and comments",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "publish":"npm publish --access public"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",

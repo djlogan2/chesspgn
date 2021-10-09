@@ -22,7 +22,13 @@ const config = {
     textresult: "White Resigns",
     // If this exists, it will export no more than this many variations.
     // zero means it will only export the main line.
-    maxvariations: 0
+    maxvariations: 0,
+    // If this exists, it will make the max line length of the movelist this.
+    // The default is 255, per the pgn specification.
+    linelength: 80,
+    // If this exists, and isn't truthy, it will write only the movelist with no tags
+    // at all. Usually used for things like getting only a movelist in unit tests.
+    writetags: true
 };
 // config itself can be left out (undefined)
 const pgnstring = exporter.exportToPgn(tags, movelist, config);

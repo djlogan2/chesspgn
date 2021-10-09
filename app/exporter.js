@@ -92,23 +92,24 @@ function buildPgnFromMovelist(movelist, linelength, maxvariations) {
 function exportPGN(tags, movelist, _config) {
   const config = _config || {};
   let pgn = '';
-  const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
-  sevenTags.forEach((tag) => {
-    if (tags?.[tag]) pgn += `[${tag} "${tags[tag]}"]\n`;
-    else if (tag === 'Date') {
-      pgn += '[Date "????.??.??"]\n';
-    } else if (tag === 'Result') {
-      pgn += '[Result "*"]\n';
-    } else {
-      pgn += `[${tag} "?"]\n`;
+  if (config.writetags === undefined || !!config.writetags) {
+    const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
+    sevenTags.forEach((tag) => {
+      if (tags?.[tag]) pgn += `[${tag} "${tags[tag]}"]\n`;
+      else if (tag === 'Date') {
+        pgn += '[Date "????.??.??"]\n';
+      } else if (tag === 'Result') {
+        pgn += '[Result "*"]\n';
+      } else {
+        pgn += `[${tag} "?"]\n`;
+      }
+    });
+
+    for (const tag in tags) {
+      if (sevenTags.indexOf(tag) === -1) pgn += `[${tag} "${tags[tag]}"]\n`;
     }
-  });
-
-  for (const tag in tags) {
-    if (sevenTags.indexOf(tag) === -1) pgn += `[${tag} "${tags[tag]}"]\n`;
+    if (!!movelist && movelist.length > 1) pgn += '\n';
   }
-
-  if (!!movelist && movelist.length > 1) pgn += '\n';
 
   pgn += buildPgnFromMovelist(movelist, config.linelength, config.maxvariations);
   if (pgn) pgn += '\n';
