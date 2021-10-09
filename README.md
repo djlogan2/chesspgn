@@ -28,7 +28,12 @@ const config = {
     linelength: 80,
     // If this exists, and isn't truthy, it will write only the movelist with no tags
     // at all. Usually used for things like getting only a movelist in unit tests.
-    writetags: true
+    writetags: true,
+    // If this exists, it won't write tags, any result, extra new lines, etc. It will
+    // JUST return the moves. It's an extension of above really because it was still
+    // writing other stuff. This will return JUST the move string. You can also use it
+    // in combination with linelength and maxvariations.
+    movesonly: false
 };
 // config itself can be left out (undefined)
 const pgnstring = exporter.exportToPgn(tags, movelist, config);

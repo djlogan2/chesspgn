@@ -92,7 +92,7 @@ function buildPgnFromMovelist(movelist, linelength, maxvariations) {
 function exportPGN(tags, movelist, _config) {
   const config = _config || {};
   let pgn = '';
-  if (config.writetags === undefined || !!config.writetags) {
+  if (config.writetags === undefined || !!config.writetags || !!config.movesonly) {
     const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
     sevenTags.forEach((tag) => {
       if (tags?.[tag]) pgn += `[${tag} "${tags[tag]}"]\n`;
@@ -112,10 +112,10 @@ function exportPGN(tags, movelist, _config) {
   }
 
   pgn += buildPgnFromMovelist(movelist, config.linelength, config.maxvariations);
-  if (pgn) pgn += '\n';
-  if (config.textresult) pgn += `{${config.textresult}}\n`;
+  if (pgn && !config.movesonly) pgn += '\n';
+  if (!config.movesonly && config.textresult) pgn += `{${config.textresult}}\n`;
   if (tags && tags.Result) pgn += tags.Result;
-  else pgn += '*';
+  else if (!config.movesonly) pgn += '*';
   return pgn;
 }
 
