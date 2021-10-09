@@ -17,9 +17,15 @@ const movelist = [
     {move: "e4", prev: 0, variations[1]},
     {move: "e5", prev: 1}
 ];
-// The third parameter is optional. If it exists, it writes this as a
-// comment as a newline before the result
-const pgnstring = exporter.exportToPgn(tags, movelist, "White resigns");
+const config = {
+    // If this exists, it will be written as a comment just before the final result
+    textresult: "White Resigns",
+    // If this exists, it will export no more than this many variations.
+    // zero means it will only export the main line.
+    maxvariations: 0
+};
+// config itself can be left out (undefined)
+const pgnstring = exporter.exportToPgn(tags, movelist, config);
 ```
 
 ###You can import a string or a buffer. In general, the number of games in a string or a buffer will be small, and as such `importer.gamelist` will be managable.

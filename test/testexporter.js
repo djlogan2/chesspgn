@@ -219,7 +219,47 @@ describe('PGN exports', () => {
       { move: 'Rc3', prev: 0, variations: [76] },
       { move: 'Qxb7', prev: 0 },
     ];
-    const pgn = exporter(tags, movelist, 'White resigns');
+    const pgn = exporter(tags, movelist, { textresult: 'White resigns' });
     chai.assert.equal(pgn, shouldequal);
+  });
+
+  it('should honor maxvariations 0 on output pgn', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { maxvariations: 0 });
+    chai.assert.equal(pgn, '[Event "?"]\n'
+          + '[Site "?"]\n'
+          + '[Date "????.??.??"]\n'
+          + '[Round "?"]\n'
+          + '[White "?"]\n'
+          + '[Black "?"]\n'
+          + '[Result "*"]\n'
+          + '\n'
+          + '1. e4 e5 2. Nf3 Nc6\n*');
+  });
+  it('should honor maxvariations 1 correctly', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { maxvariations: 1 });
+    chai.assert.equal(pgn, '[Event "?"]\n'
+        + '[Site "?"]\n'
+        + '[Date "????.??.??"]\n'
+        + '[Round "?"]\n'
+        + '[White "?"]\n'
+        + '[Black "?"]\n'
+        + '[Result "*"]\n'
+        + '\n'
+        + '1. e4 e5 2. Nf3 (2. d4 exd4) 2. ... Nc6\n*');
+  });
+  it('should honor maxvariations 2 correctly', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { maxvariations: 2 });
+    chai.assert.equal(pgn, '[Event "?"]\n'
+        + '[Site "?"]\n'
+        + '[Date "????.??.??"]\n'
+        + '[Round "?"]\n'
+        + '[White "?"]\n'
+        + '[Black "?"]\n'
+        + '[Result "*"]\n'
+        + '\n'
+        + '1. e4 e5 2. Nf3 (2. d4 exd4 (2. ... d5 3. Be2)) 2. ... Nc6\n*');
   });
 });

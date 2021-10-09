@@ -14,7 +14,7 @@ function thisMove(node, moveNumber, writeMovNumber, whiteToMove) {
   return string;
 }
 
-function allVariations(movelist, cmi, moveNumber, whiteToMove) {
+function allVariations(movelist, cmi, moveNumber, whiteToMove, maxvariations) {
   if (!movelist[cmi].variations) return '';
 
   let string = '';
@@ -22,17 +22,23 @@ function allVariations(movelist, cmi, moveNumber, whiteToMove) {
   const nextMoveNumber = moveNumber + (whiteToMove ? 0 : 1);
   const nextToMove = !whiteToMove;
 
-  variations.forEach((v) => {
+  for (let vv = 0;
+    (maxvariations === undefined || vv < maxvariations) && vv < variations.length;
+    vv += 1) {
+    const v = variations[vv];
     string += `(${thisMove(movelist[v], moveNumber, true, whiteToMove, v)}`;
-    const nextmove = nextMove(movelist, v, nextMoveNumber, nextToMove);
+    // eslint-disable-next-line no-use-before-define
+    let mv;
+    if (maxvariations !== undefined) mv = maxvariations - 1;
+    const nextmove = nextMove(movelist, v, nextMoveNumber, nextToMove, mv);
     if (nextmove) string += ` ${nextmove}`;
     string += ')';
-  });
+  }
 
   return string;
 }
 
-function nextMove(movelist, cmi, moveNumber, whiteToMove) {
+function nextMove(movelist, cmi, moveNumber, whiteToMove, maxvariations) {
   if (!movelist || !Array.isArray(movelist) || !movelist.length || !movelist[cmi].variations) return '';
 
   const nextMoveNumber = moveNumber + (whiteToMove ? 0 : 1);
@@ -45,9 +51,11 @@ function nextMove(movelist, cmi, moveNumber, whiteToMove) {
     whiteToMove,
     movelist[cmi].variations[0],
   );
-  const variations = allVariations(movelist, cmi, moveNumber, whiteToMove);
+  // let mv;
+  // if (!Number.isNaN(maxvariations)) mv = maxvariations - 1;
+  const variations = allVariations(movelist, cmi, moveNumber, whiteToMove, maxvariations);
   const nextmove = nextMove(movelist, movelist[cmi].variations[0],
-    nextMoveNumber, nextToMove);
+    nextMoveNumber, nextToMove, maxvariations);
 
   if (variations) string += ` ${variations}`;
 
@@ -59,10 +67,11 @@ function nextMove(movelist, cmi, moveNumber, whiteToMove) {
   return string;
 }
 
-function buildPgnFromMovelist(movelist) {
-  let longString = nextMove(movelist, 0, 1, true);
+function buildPgnFromMovelist(movelist, linelength, maxvariations) {
+  const ll = linelength || 255;
+  let longString = nextMove(movelist, 0, 1, true, maxvariations);
   let reformatted = '';
-  while (longString.length > 255) {
+  while (ll > 0 && longString.length > ll) {
     longString = longString.trimStart();
     const idx1 = longString.lastIndexOf(' ', 255);
     const idx2 = longString.indexOf('\n'); // May be in a comment. Also we just want the first one!
@@ -80,7 +89,8 @@ function buildPgnFromMovelist(movelist) {
   return reformatted;
 }
 
-function exportPGN(tags, movelist, textresult) {
+function exportPGN(tags, movelist, _config) {
+  const config = _config || {};
   let pgn = '';
   const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
   sevenTags.forEach((tag) => {
@@ -93,15 +103,16 @@ function exportPGN(tags, movelist, textresult) {
       pgn += `[${tag} "?"]\n`;
     }
   });
+
   for (const tag in tags) {
     if (sevenTags.indexOf(tag) === -1) pgn += `[${tag} "${tags[tag]}"]\n`;
   }
 
   if (!!movelist && movelist.length > 1) pgn += '\n';
 
-  pgn += buildPgnFromMovelist(movelist);
+  pgn += buildPgnFromMovelist(movelist, config.linelength, config.maxvariations);
   if (pgn) pgn += '\n';
-  if (textresult) pgn += `{${textresult}}\n`;
+  if (config.textresult) pgn += `{${config.textresult}}\n`;
   if (tags && tags.Result) pgn += tags.Result;
   else pgn += '*';
   return pgn;

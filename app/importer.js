@@ -72,7 +72,7 @@ class Importer {
           // delete "this.gamelist", and continue.
           //
           if (this.gamelist) {
-            if(this.events.listeners("gamesready")) {
+            if (this.events.listeners('gamesready')) {
               this.events.emit('gamesready', this.gamelist);
               this.gamelist = [];
             }
@@ -84,7 +84,7 @@ class Importer {
         if (!!saveBuffer && saveBuffer.length) {
           this.feed(saveBuffer.toString('utf8'));
           if (this.gameobject) this.gamelist.push(this.gameobject);
-          if (!!this.gamelist) {
+          if (this.gamelist) {
             this.events.emit('gamesready', this.gamelist);
           }
         }
