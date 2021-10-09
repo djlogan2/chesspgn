@@ -4,7 +4,8 @@
   "description": "Import and export PGN games with variations and comments",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "publish":"npm publish --access public"
   },
   "repository": {
     "type": "git",
