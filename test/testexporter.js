@@ -262,4 +262,19 @@ describe('PGN exports', () => {
         + '\n'
         + '1. e4 e5 2. Nf3 (2. d4 exd4 (2. ... d5 3. Be2)) 2. ... Nc6\n*');
   });
+  it('should write move only when told to write moves only', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { movesonly: true, maxvariations: 2 });
+    chai.assert.equal(pgn, '1. e4 e5 2. Nf3 (2. d4 exd4 (2. ... d5 3. Be2)) 2. ... Nc6');
+  });
+  it('should not write tags when told to not write tags', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { writetags: false, maxvariations: 2, textresult: 'Black Rocks' });
+    chai.assert.equal(pgn, '1. e4 e5 2. Nf3 (2. d4 exd4 (2. ... d5 3. Be2)) 2. ... Nc6\n{Black Rocks}\n*');
+  });
+  it('should honor the linelength config key', () => {
+    const movelist = makemoves('e4', 'e5', 'Nf3', 'Nc6', 2, 'd4', 'exd4', 1, 'd5', 'Be2', 1, 'Nc3', 'Be7');
+    const pgn = exporter(null, movelist, { movesonly: true, maxvariations: 2, linelength: 20 });
+    chai.assert.equal(pgn, '1. e4 e5 2. Nf3 (2.\nd4 exd4 (2. ... d5\n3. Be2)) 2. ... Nc6');
+  });
 });

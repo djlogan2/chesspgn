@@ -73,9 +73,9 @@ function buildPgnFromMovelist(movelist, linelength, maxvariations) {
   let reformatted = '';
   while (ll > 0 && longString.length > ll) {
     longString = longString.trimStart();
-    const idx1 = longString.lastIndexOf(' ', 255);
+    const idx1 = longString.lastIndexOf(' ', ll);
     const idx2 = longString.indexOf('\n'); // May be in a comment. Also we just want the first one!
-    const idx3 = longString.lastIndexOf('\t', 255); // May be in a comment
+    const idx3 = longString.lastIndexOf('\t', ll); // May be in a comment
     const idxmax = Math.max(idx1, idx2, idx3);
     const idx = Math.min(
       idx1 === -1 ? idxmax : idx1,
@@ -92,7 +92,7 @@ function buildPgnFromMovelist(movelist, linelength, maxvariations) {
 function exportPGN(tags, movelist, _config) {
   const config = _config || {};
   let pgn = '';
-  if (config.writetags === undefined || !!config.writetags || !!config.movesonly) {
+  if ((config.writetags === undefined || !!config.writetags) && !config.movesonly) {
     const sevenTags = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
     sevenTags.forEach((tag) => {
       if (tags?.[tag]) pgn += `[${tag} "${tags[tag]}"]\n`;
@@ -112,10 +112,14 @@ function exportPGN(tags, movelist, _config) {
   }
 
   pgn += buildPgnFromMovelist(movelist, config.linelength, config.maxvariations);
-  if (pgn && !config.movesonly) pgn += '\n';
-  if (!config.movesonly && config.textresult) pgn += `{${config.textresult}}\n`;
-  if (tags && tags.Result) pgn += tags.Result;
-  else if (!config.movesonly) pgn += '*';
+
+  if (!config.movesonly) {
+    if (pgn) pgn += '\n';
+    if (config.textresult) pgn += `{${config.textresult}}\n`;
+    if (tags && tags.Result) pgn += tags.Result;
+    else pgn += '*';
+  }
+
   return pgn;
 }
 
