@@ -63,7 +63,12 @@ class Importer {
             saveBuffer = chunk2;
           } else {
             end += 1;
-            this.feed(chunk2.toString('utf8', 0, end));
+            try {
+              this.feed(chunk2.toString('utf8', 0, end));
+            } catch (e) {
+              this.events.emit('error', e);
+              return;
+            }
           }
           saveBuffer = chunk2.slice(end);
           //
@@ -79,6 +84,9 @@ class Importer {
           }
           chunk = stream.read();
         }
+      })
+      .on('error', (err) => {
+        console.log('here');
       })
       .on('end', () => {
         if (!!saveBuffer && saveBuffer.length) {

@@ -17,6 +17,25 @@ const pgn = '[Event "?"]\n'
     + '2. Nf3 *'
     + '\n';
 
+const alexsinvalidpgn = '[Event "Global"]\n'
+    + '[Site "Internet Chess Club"]\n'
+    + '[Date "2021.11.04"]\n'
+    + '[Round "1"]\n'
+    + '[White "Max Levchenko"]\n'
+    + '[Black "max_premove_2"]\n'
+    + '[Result "0-1"]\n'
+    + '[Time "13:25:19"]\n'
+    + '[ICCRated "0"]\n'
+    + '[ICCGameId "iYpecwk9gJHvysifL"]\n'
+    + '[ICCTimeControl "60/0 none -- 60/0 none"]\n'
+    + '[TimeControl "60"]\n'
+    + '0-1\n'
+    + 'Browse for PGN window has only files with .pgn format in it\n'
+    + 'Browse for PGN window has only files with .pgn format in it\n'
+    + 'Browse for PGN window has only files with .pgn format in it\n'
+    + 'Browse for PGN window has only files with .pgn format in it\n'
+    + 'Browse for PGN window has only files with .pgn format in it';
+
 const pgn1 = '[Event "ICC 5 0 u"]\n'
     + '[Site "Internet Chess Club"]\n'
     + '[Date "2019.10.13"]\n'
@@ -206,6 +225,22 @@ describe('PGN Import', () => {
       }).on('end', () => {
         chai.assert.equal(count, 2);
         done();
+      });
+  });
+
+  it.only('should do what with this invalid file', (done) => {
+    const importer = new Importer();
+    const pgnstream = new Readable();
+    pgnstream.push(alexsinvalidpgn);
+    pgnstream.push(null);
+    let count = 0;
+    importer.import(pgnstream)
+      .events.on('gamesready', (gamelist) => {
+        count += gamelist.length;
+      }).on('error', (err) => {
+        done();
+      // }).on('end', () => {
+      //   chai.fail('We should not get here on error');
       });
   });
 
