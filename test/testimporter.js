@@ -236,7 +236,7 @@ describe('PGN Import', () => {
     chai.assert.equal(importer.gamelist.length, 2);
   });
 
-  it.only('should parse lichess pgn correctly', () => {
+  it('should parse lichess pgn correctly', () => {
     const importer = new Importer();
     importer.debugonerror = true;
     chai.assert.doesNotThrow(() => importer.import(lichesspgn));
