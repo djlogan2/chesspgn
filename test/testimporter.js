@@ -2,6 +2,29 @@ const chai = require('chai');
 const { Readable } = require('stream');
 const Importer = require('../app/importer');
 
+const lichesspgn = '[Event "Hourly SuperBlitz Arena"]\n'
+    + '[Site "https://lichess.org/gMiOIeXv"]\n'
+    + '[Date "2021.08.15"]\n'
+    + '[White "zstudent"]\n'
+    + '[Black "Seneca11"]\n'
+    + '[Result "1-0"]\n'
+    + '[UTCDate "2021.08.15"]\n'
+    + '[UTCTime "14:47:55"]\n'
+    + '[WhiteElo "2181"]\n'
+    + '[BlackElo "1774"]\n'
+    + '[WhiteRatingDiff "+4"]\n'
+    + '[BlackRatingDiff "-1"]\n'
+    + '[Variant "Standard"]\n'
+    + '[TimeControl "180+0"]\n'
+    + '[ECO "B41"]\n'
+    + '[Opening "Sicilian Defense: Kan Variation, Maróczy Bind, Réti Variation"]\n'
+    + '[Termination "Normal"]\n'
+    + '[Annotator "lichess.org"]\n'
+    + '\n'
+    + '1. e4 { [%eval 0.24] [%clk 0:03:00] } 1... c5 { [%eval 0.32] [%clk 0:03:00] } 2. Nf3 { [%eval 0.0] [%clk 0:02:59] } 2... e6?! { (0.00 → 0.54) Inaccuracy. d6 was best. } { [%eval 0.54] [%clk 0:02:58] } (2... d6 3. c3 Nf6 4. h3 Nc6 5. Bd3 e5 6. O-O Be7 7. Bc2) 3. d4 { [%eval 0.42] [%clk 0:02:58] } 3... cxd4 { [%eval 0.15] [%clk 0:02:57] } 4. Nxd4 { [%eval 0.23] [%clk 0:02:58] } 4... a6 { [%eval 0.19] [%clk 0:02:56] } 5. c4 { [%eval 0.27] [%clk 0:02:57] } { B41 Sicilian Defense: Kan Variation, Maróczy Bind, Réti Variation } 5... Qc7 { [%eval 0.36] [%clk 0:02:55] } 6. Nc3 { [%eval 0.6] [%clk 0:02:56] } 6... Nc6 { [%eval 0.43] [%clk 0:02:49] } 7. Nc2 { [%eval 0.52] [%clk 0:02:54] } 7... Bb4?? { (0.52 → 3.62) Blunder. b6 was best. } { [%eval 3.62] [%clk 0:02:45] } (7... b6 8. Be3 Be7 9. Be2 Nf6 10. f4 d6 11. O-O Bb7 12. Rc1) 8. Nxb4 { [%eval 3.23] [%clk 0:02:53] } 8... Nxb4 { [%eval 3.43] [%clk 0:02:43] } 9. Be3 { [%eval 3.62] [%clk 0:02:50] } 9... d6 { [%eval 3.9] [%clk 0:02:32] } 10. Be2 { [%eval 4.12] [%clk 0:02:49] } 10... Nf6 { [%eval 3.88] [%clk 0:02:28] } 11. O-O { [%eval 3.84] [%clk 0:02:46] } 11... O-O { [%eval 3.98] [%clk 0:02:27] } 12. Rc1 { [%eval 3.75] [%clk 0:02:42] } 12... Qb8?! { (3.75 → 4.75) Inaccuracy. Bd7 was best. } { [%eval 4.75] [%clk 0:02:11] } (12... Bd7 13. Qd2) 13. Bb6?! { (4.75 → 3.71) Inaccuracy. Qd2 was best. } { [%eval 3.71] [%clk 0:02:35] } (13. Qd2) 13... Nc6 { [%eval 3.77] [%clk 0:02:04] } 14. f4 { [%eval 3.35] [%clk 0:02:27] } 14... Nd7 { [%eval 3.04] [%clk 0:01:52] } 15. Be3 { [%eval 3.35] [%clk 0:02:25] } 15... e5?! { (3.35 → 4.23) Inaccuracy. Nf6 was best. } { [%eval 4.23] [%clk 0:01:48] } (15... Nf6 16. Bf3 Bd7 17. Rf2 e5 18. f5 Nd4 19. Bxd4 exd4 20. Qxd4 Re8 21. Rd2 Bc6 22. Re1) 16. Nd5 { [%eval 4.02] [%clk 0:02:19] } 16... Re8? { (4.02 → 6.68) Mistake. exf4 was best. } { [%eval 6.68] [%clk 0:01:27] } (16... exf4 17. Bxf4) 17. f5? { (6.68 → 4.00) Mistake. Bh5 was best. } { [%eval 4.0] [%clk 0:02:12] } (17. Bh5) 17... f6? { (4.00 → 8.76) Mistake. Ne7 was best. } { [%eval 8.76] [%clk 0:01:21] } (17... Ne7) 18. g4?! { (8.76 → 4.93) Inaccuracy. Bh5 was best. } { [%eval 4.93] [%clk 0:02:10] } (18. Bh5 Rf8) 18... Ne7?! { (4.93 → 8.55) Inaccuracy. Rf8 was best. } { [%eval 8.55] [%clk 0:01:17] } (18... Rf8 19. g5) 19. g5?! { (8.55 → 4.92) Inaccuracy. Nxe7+ was best. } { [%eval 4.92] [%clk 0:02:06] } (19. Nxe7+ Rxe7 20. c5 b5 21. cxd6 Rf7 22. Rc7 Nb6 23. Qb3 Bd7 24. Rfc1 Be8 25. R1c6 Nc4) 19... Nxd5 { [%eval 6.09] [%clk 0:01:16] } 20. Qxd5+ { [%eval 5.38] [%clk 0:02:06] } 20... Kh8 { [%eval 5.75] [%clk 0:01:14] } 21. Rcd1 { [%eval 4.61] [%clk 0:02:00] } 21... Nb6? { (4.61 → 9.84) Mistake. fxg5 was best. } { [%eval 9.84] [%clk 0:01:06] } (21... fxg5 22. Qf7 Nf6 23. Bxg5 Qa7+ 24. c5 b6 25. Qxa7 Rxa7 26. cxb6 Rd7 27. Bxf6 gxf6 28. a4) 22. Bxb6 { [%eval 9.62] [%clk 0:01:57] } 22... Bd7 { [%eval 9.04] [%clk 0:01:00] } 23. gxf6 { [%eval 9.61] [%clk 0:01:46] } 23... Bc6 { [%eval 9.73] [%clk 0:00:53] } 24. Qxd6 { [%eval 9.69] [%clk 0:01:39] } 24... Qxd6 { [%eval 9.67] [%clk 0:00:48] } 25. Rxd6 { [%eval 9.4] [%clk 0:01:39] } 25... gxf6 { [%eval 9.59] [%clk 0:00:46] } 26. Bf3 { [%eval 9.29] [%clk 0:01:32] } 26... Rg8+ { [%eval 9.53] [%clk 0:00:45] } 27. Kf2 { [%eval 9.75] [%clk 0:01:29] } 27... a5 { [%eval 9.75] [%clk 0:00:28] } 28. Rxf6 { [%eval 10.0] [%clk 0:01:27] } 28... Ra6 { [%eval 15.54] [%clk 0:00:25] } 29. Bc7 { [%eval 15.85] [%clk 0:01:24] } 29... Re8?! { (15.85 → Mate in 4) Checkmate is now unavoidable. Rg5 was best. } { [%eval #4] [%clk 0:00:18] } (29... Rg5 30. h4) 30. Rg1 { [%eval #3] [%clk 0:01:16] } 30... Bxe4 { [%eval #3] [%clk 0:00:08] } 31. Rxa6 { [%eval #7] [%clk 0:01:13] } 31... Bxf3 { [%eval #3] [%clk 0:00:07] } 32. Re6 { [%eval #7] [%clk 0:01:07] } 32... e4 { [%eval #1] [%clk 0:00:06] } 33. Rxe8# { [%clk 0:01:05] } { White wins by checkmate. } 1-0\n'
+    + '\n'
+    + '\n';
+
 const pgn = '[Event "?"]\n'
     + '[Site "?"]\n'
     + '[Date "????.??.??"]\n'
@@ -213,6 +236,13 @@ describe('PGN Import', () => {
     chai.assert.equal(importer.gamelist.length, 2);
   });
 
+  it.only('should parse lichess pgn correctly', () => {
+    const importer = new Importer();
+    importer.debugonerror = true;
+    chai.assert.doesNotThrow(() => importer.import(lichesspgn));
+    chai.assert.equal(importer.gamelist.length, 1);
+  });
+
   it('should parse pgn1 correctly as a stream', (done) => {
     const importer = new Importer();
     const pgnstream = new Readable();
@@ -228,7 +258,7 @@ describe('PGN Import', () => {
       });
   });
 
-  it.only('should do what with this invalid file', (done) => {
+  it('should do what with this invalid file', (done) => {
     const importer = new Importer();
     const pgnstream = new Readable();
     pgnstream.push(alexsinvalidpgn);

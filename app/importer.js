@@ -3,6 +3,17 @@ const EventEmitter = require('events');
 
 class Importer {
   constructor() {
+    this.nonstandardnags = {
+      '!': '$1',
+      '?': '$2',
+      '!!': '$3',
+      '??': '$4',
+      '!?': '$5',
+      '?!': '$6',
+      '=': '$10',
+      '+-': '$18',
+      '-+': '$19',
+    };
     this.events = new EventEmitter();
     this.debug = [];
     this.lexer = moo.states({
@@ -20,7 +31,7 @@ class Importer {
         RPAREN: /\)/,
         LBRACE: { match: /{/, push: 'comment1' },
         SEMICOLON: { match: /;/, push: 'comment2' },
-        SAN: /(?:[RQKBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[RQBN])?|O-O(?:-O)?)[+#]?/,
+        SAN: /(?:[RQKBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[RQBN])?|O-O(?:-O)?)(?:#|\?[?!]?|![!?]?|=|\+-?|-\+)?/,
         SYMBOL: /[a-zA-Z0-9_]+/,
         NL: { match: /\r?\n/, lineBreaks: true },
       },
@@ -227,13 +238,27 @@ class Importer {
     this.pushdebug('san', token.type, token.text);
     if (token.type === 'PERIOD' || token.type === 'DOTDOTDOT') return; // Skip "1." "1..." "1. ..." "..." etc.
     if (token.type !== 'SAN') this.error('Expecting periods or a SAN move', token);
+
+    const re = /^(.*?)(!!?|\?\??|!\?|\?!|=|\+-?|-\+|#)?$/;
+    let [_, move, nag] = re.exec(token.value);
+
+    if (nag === '+' || nag === '#') {
+      move += nag;
+      nag = undefined;
+    }
+
     if (!this.gameobject.movelist[this.cmi].variations) {
       this.gameobject.movelist[this.cmi].variations = [];
     }
+
     this.gameobject.movelist[this.cmi].variations.push(
       this.gameobject.movelist.length,
     );
-    this.gameobject.movelist.push({ move: token.value, prev: this.cmi });
+
+    const node = { move, prev: this.cmi };
+    if (nag && this.nonstandardnags[nag]) node.nag = this.nonstandardnags[nag];
+    this.gameobject.movelist.push(node);
+
     this.cmi = this.gameobject.movelist.length - 1;
     this.state = this.nag;
   }
