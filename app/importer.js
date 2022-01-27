@@ -31,6 +31,7 @@ class Importer {
         RPAREN: /\)/,
         LBRACE: { match: /{/, push: 'comment1' },
         SEMICOLON: { match: /;/, push: 'comment2' },
+        NONSTANDARDNAG: /\?[?!]?|![!?]?|=|\+-|-\+/,
         SAN: /(?:[RQKBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[RQBN])?|O-O(?:-O)?)(?:#|\?[?!]?|![!?]?|=|\+-?|-\+)?/,
         SYMBOL: /[a-zA-Z0-9_]+/,
         NL: { match: /\r?\n/, lineBreaks: true },
@@ -46,6 +47,7 @@ class Importer {
     this.info = null;
     this.line = 1;
     this.nl = 0;
+    this.nonstandardcomment = '';
     this.state = this.game;
   }
 
@@ -96,7 +98,7 @@ class Importer {
           chunk = stream.read();
         }
       })
-      .on('error', (err) => {
+      .on('error', () => {
         console.log('here');
       })
       .on('end', () => {
@@ -215,6 +217,9 @@ class Importer {
   variationstart(token) {
     this.pushdebug('variationstart', token.type, token.text);
     switch (token.type) {
+      case 'LBRACE':
+        this.state = (token2) => this.commenttext(token2, true);
+        return;
       case 'INTEGER':
         this.state = this.movenumber;
         return;
@@ -240,7 +245,7 @@ class Importer {
     if (token.type !== 'SAN') this.error('Expecting periods or a SAN move', token);
 
     const re = /^(.*?)(!!?|\?\??|!\?|\?!|=|\+-?|-\+|#)?$/;
-    let [_, move, nag] = re.exec(token.value);
+    let [, move, nag] = re.exec(token.value);
 
     if (nag === '+' || nag === '#') {
       move += nag;
@@ -257,6 +262,10 @@ class Importer {
 
     const node = { move, prev: this.cmi };
     if (nag && this.nonstandardnags[nag]) node.nag = this.nonstandardnags[nag];
+    if (this.nonstandardcomment) {
+      node.nonstandardcomment = this.nonstandardcomment;
+      this.nonstandardcomment = '';
+    }
     this.gameobject.movelist.push(node);
 
     this.cmi = this.gameobject.movelist.length - 1;
@@ -265,31 +274,44 @@ class Importer {
 
   nag(token) {
     this.pushdebug('nag', token.type, token.text);
-    if (token.type === 'NAG') {
+    if (token.type === 'NONSTANDARDNAG') {
+      if (!this.gameobject.movelist[this.cmi].nonstandardnag) {
+        this.gameobject.movelist[this.cmi].nonstandardnag = [];
+      }
+      this.gameobject.movelist[this.cmi].nonstandardnag.push(this.nonstandardnags[token.value]);
+    } else if (token.type === 'NAG') {
       this.gameobject.movelist[this.cmi].nag = token.value;
     } else this.comment(token);
   }
 
-  comment(token) {
-    this.pushdebug('comment', token.type, token.text);
+  comment(token, nonstandard) {
+    this.pushdebug(`${nonstandard ? 'nonstandard' : ''}comment`, token.type, token.text);
     if (token.type === 'LBRACE' || token.type === 'SEMICOLON') {
-      this.state = this.commenttext;
+      this.state = (token2) => this.commenttext(token2, nonstandard);
       this.gameobject.movelist[this.cmi].comment = '';
     } else this.recursive(token);
   }
 
-  commenttext(token) {
-    this.pushdebug('commenttext', token.type, token.text);
+  commenttext(token, nonstandard) {
+    let com;
+    this.pushdebug(`${nonstandard ? 'nonstandard' : ''}commenttext`, token.type, token.text);
     switch (token.type) {
       case 'C1NL':
-        this.gameobject.movelist[this.cmi].comment += token.value;
+        if (nonstandard) this.nonstandardcomment += token.value;
+        else this.gameobject.movelist[this.cmi].comment += token.value;
         return;
       case 'C1':
-        this.gameobject.movelist[this.cmi].comment += token.value.substring(
+        com = token.value.substring(
           0,
           token.value.length - 1,
         );
-        this.state = this.nag;
+        if (nonstandard) {
+          this.nonstandardcomment += com;
+          this.state = this.variationstart;
+        } else {
+          this.gameobject.movelist[this.cmi].comment += com;
+          this.state = this.nag;
+        }
         return;
       case 'C2':
         this.gameobject.movelist[this.cmi].comment += token.value.replace(/\r?\n/, '');

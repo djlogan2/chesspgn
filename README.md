@@ -67,7 +67,9 @@ const node = {
   prev: 23,   // The index of this nodes parent. movelist[23] is this nodes parent
   variations: [40, 52, 63] // Our children. movelist[40], movelist[52], and movelist[63] are all variations of moves made in response to e4, with movelist[40], or the first variation in the list, being main line.
   comment: "This comment will show up in exported PGNs as the text in the {curly braces}. Imported {curly braces} will be here",
-  nag: "$3" // This will be imported if valid nag syntax is found. On export though, it will export anything in this field, making PGNs invalid if it's not a true NAG.
+  nag: "$3", // This will be imported if valid nag syntax is found. On export though, it will export anything in this field, making PGNs invalid if it's not a true NAG.
+  nonstandardcomment: "This comment appeared BEFORE the move", // If we have non-standard PGN comments, they will be saved here
+  nonstandardnag: ["$4", "$5", "$6"] // If we have nonstandard NAGs (i.e. multiples, particularly non-standardized like 6. 'Nf6?? +- = !' they will be saved in this array.
 };
 ```
 `movelist[0]` NEVER has a move, nor does it have a `prev`. `movelist[0]` is the root of the tree, which would be position at the starting FEN. It's `variation`s are all of the first players various responses to the initial position.

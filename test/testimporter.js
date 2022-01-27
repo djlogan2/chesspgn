@@ -2,6 +2,50 @@ const chai = require('chai');
 const { Readable } = require('stream');
 const Importer = require('../app/importer');
 
+const chesscom = '[Event "Live Chess"]\n'
+    + '[Site "Chess.com"]\n'
+    + '[Date "2022.01.24"]\n'
+    + '[Round "-"]\n'
+    + '[White "PABLOAK123"]\n'
+    + '[Black "lisetttte"]\n'
+    + '[Result "1-0"]\n'
+    + '[CurrentPosition "r3k2Q/ppp3R1/3p4/4p3/3bP3/1R1B1N1P/P4P2/4K3 b - -"]\n'
+    + '[Timezone "UTC"]\n'
+    + '[ECO "C20"]\n'
+    + '[ECOUrl "https://www.chess.com/openings/Kings-Pawn-Opening-Wayward-Queen-Attack"]\n'
+    + '[UTCDate "2022.01.24"]\n'
+    + '[UTCTime "18:38:23"]\n'
+    + '[WhiteElo "422"]\n'
+    + '[BlackElo "441"]\n'
+    + '[TimeControl "180"]\n'
+    + '[Termination "PABLOAK123 won by checkmate"]\n'
+    + '[StartTime "18:38:23"]\n'
+    + '[EndDate "2022.01.24"]\n'
+    + '[EndTime "18:41:55"]\n'
+    + '[Link "https://www.chess.com/game/live/36788469781"]\n'
+    + '\n'
+    + '1. e4 e5 2. Qh5 Qf6 3. Nf3 Nc6 4. d3 Bb4+ 5. c3 Ba5 6. Bg5 g6?? ± {BLUNDER\n'
+    + '(+7.63)} ({(+0.44) The best move was} 6... Qe6 7. Nbd2 Nf6 8. Qh4 d6 9. Nc4 Bb6\n'
+    + '10. a4 Ng4 11. Nxb6 axb6 12. Be2 b5 13. Bd1 h6 14. h3 Nf6 15. O-O) 7. Qh4?? = +- -+ ?? !\n'
+    + '{BLUNDER (-0.12)} ({(+7.63) The best move was} 7. Bxf6 gxh5 8. Bxh8 d6 9. Nbd2\n'
+    + 'Bb6 10. Be2 Nce7 11. Nh4 Bd7 12. d4 Nh6 13. Bg7 Ng4 14. O-O Ng6 15. Nxg6 hxg6\n'
+    + '16. a4 exd4) 7... Qd6 {INACCURACY (+0.91)} ({(-0.12) The best move was} 7... Qg7\n'
+    + '8. Nbd2 h6 9. Be3 Nf6 10. Qg3 d6 11. d4 Bb6 12. Bb5 O-O 13. Bxc6 exd4 14. Bxd4\n'
+    + 'bxc6 15. O-O c5 16. Bxf6 Qxf6 17. e5 dxe5) 8. b4 Nxb4? ± {MISTAKE (+4.21)}\n'
+    + '({(+0.85) The best move was} 8... Bb6 9. a4 f6 10. Bc1 a6 11. Ba3 Qe6 12. d4 Qf7\n'
+    + '13. a5 Ba7 14. b5 axb5 15. Bxb5 g5 16. Qg3 d6) 9. cxb4 {Critical move.} 9...\n'
+    + 'Bxb4+ 10. Nbd2 Qxd3?? {BLUNDER (+13.67)} ({(+3.99) The best move was} 10... f6\n'
+    + '11. Be3 h5 12. Be2 g5 13. Nxg5 fxg5 14. Bxg5 Qg6 15. O-O Rh7 16. Nb3 d5 17. f4\n'
+    + 'Bg4 18. f5 Qf7 19. Bxg4 hxg4) 11. Bxd3 f6 12. Bxf6 Nxf6 13. Qxf6 d6 14. Qxh8+\n'
+    + 'Ke7 15. Qxh7+ Kf6 16. Rb1 Bc3 17. Rb3 Bd4 18. g4 Bxg4 19. h3 Bxf3? {MISTAKE\n'
+    + '(+37.78)} ({(+25.63) The best move was} 19... Be6 20. Qh4+ Kf7 21. Ng5+ Kf6 22.\n'
+    + 'Nxe6+ Kxe6 23. Bc4+ Kd7 24. Qh7+ Kd8 25. Qg8+ Ke7 26. Qf7+ Kd8 27. Qf8+ Kd7 28.\n'
+    + 'Qxa8 a6 29. Kf1 Bxf2 30. Qxb7 Bh4 31. Rf3 Bg5 32. Rf7+ Be7 33. Qxa6 d5 34. Bxd5)\n'
+    + '20. Nxf3 g5 21. Rg1 Ke6 22. Rxg5 {FASTER MATE (♔ Mate in 4)} ({(♔ Mate in 2)\n'
+    + 'Checkmate after} 22. Nxg5+ Kf6 23. Qf7#) 22... Kf6 23. Qh6+ {FASTER MATE (♔ Mate\n'
+    + 'in 2)} ({(♔ Mate in 1) Checkmate after} 23. Rg6#) 23... Kf7 24. Rg7+ Ke8 25.\n'
+    + 'Qh8# 1-0';
+
 const lichesspgn = '[Event "Hourly SuperBlitz Arena"]\n'
     + '[Site "https://lichess.org/gMiOIeXv"]\n'
     + '[Date "2021.08.15"]\n'
@@ -240,6 +284,13 @@ describe('PGN Import', () => {
     const importer = new Importer();
     importer.debugonerror = true;
     chai.assert.doesNotThrow(() => importer.import(lichesspgn));
+    chai.assert.equal(importer.gamelist.length, 1);
+  });
+
+  it.only('should parse chess.com pgn correctly', () => {
+    const importer = new Importer();
+    importer.debugonerror = true;
+    chai.assert.doesNotThrow(() => importer.import(chesscom));
     chai.assert.equal(importer.gamelist.length, 1);
   });
 
