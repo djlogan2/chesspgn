@@ -2,6 +2,40 @@ const chai = require('chai');
 const { Readable } = require('stream');
 const Importer = require('../app/importer');
 
+const ctyexample = '[Event "Internet Chess Club"]\n'
+    + '[Site "Internet Chess Club"]\n'
+    + '[Date "2022.06.06"]\n'
+    + '[Round "?"]\n'
+    + '[White "CHEY.22.7_PrestonY"]\n'
+    + '[Black "IMCY.22.7_EthanW"]\n'
+    + '[Result "1-0"]\n'
+    + '[ECO "C55"]\n'
+    + '[WhiteElo "1600"]\n'
+    + '[BlackElo "1600"]\n'
+    + '[Annotator "Park,Sangmin"]\n'
+    + '[PlyCount "39"]\n'
+    + '[EventDate "2022.??.??"]\n'
+    + '[TimeControl "900"]\n'
+    + '\n'
+    + '1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Bc4 {This allows a typical equlizing trick\n'
+    + 'from Black.} (4. Bb5 {pinning this knight is the main line, indirectly\n'
+    + 'attacking the e5-pawn.} Nd4 5. Bc4) 4... Bb4 (4... Nxe4 $1 5. Nxe4 d5 6. Bd3\n'
+    + 'dxe4 7. Bxe4 Bd6 {After these moves, Black has equal shares in the center and\n'
+    + 'caught up the development, which we call in chess, Black equalized the game.})\n'
+    + '5. a3 (5. Nd5 Nxe4 6. Qe2 Nd6 7. Nxb4 Nxb4 8. Qxe5+ Qe7 9. Qxe7+ Kxe7 {Without\n'
+    + 'queens, Black\'s weak king position does not matter much. Also, Black is\n'
+    + 'attacking the weak c2 pawn with no defenders. However, White can castle and\n'
+    + 'develop rooks as well as White keeps two bishops which are very strong in the\n'
+    + 'open position.}) 5... Bxc3 6. dxc3 Nxe4 7. Qd3 (7. Bxf7+ Kxf7 8. Qd5+ Kf8 9.\n'
+    + 'Qxe4 {This small tactics takes the piece and the pawn back making Black\'s king\n'
+    + 'impossible to castle.}) 7... Nf6 8. Ng5 O-O 9. Bxf7+ Rxf7 10. Nxf7 Kxf7 {\n'
+    + 'This trade Bishop, Knight vs Pawn, Rook is often a bad idea, since two minor\n'
+    + 'pieces are generally stronger than a rook and a pawn by experiments.} 11. f4 (\n'
+    + '11. Bg5 {first and then open up the f-file was safer.}) 11... e4 12. Qc4+ d5\n'
+    + '13. Qe2 Bg4 14. Qe3 Qd7 15. Rf1 Re8 16. f5 a6 17. Qc5 b6 18. Qf2 h6 19. Be3 a5\n'
+    + '20. b4 {Black is still much better, did you lose on time?} (20. h3 Bh5 21. g4 {\n'
+    + 'wins a bishop or a knight.}) 1-0\n';
+
 const chesscom = '[Event "Live Chess"]\n'
     + '[Site "Chess.com"]\n'
     + '[Date "2022.01.24"]\n'
@@ -287,7 +321,14 @@ describe('PGN Import', () => {
     chai.assert.equal(importer.gamelist.length, 1);
   });
 
-  it.only('should parse chess.com pgn correctly', () => {
+  it('should parse chess.com pgn correctly', () => {
+    const importer = new Importer();
+    importer.debugonerror = true;
+    chai.assert.doesNotThrow(() => importer.import(chesscom));
+    chai.assert.equal(importer.gamelist.length, 1);
+  });
+
+  it("should parse cty's example from ICC's web site pgn correctly", () => {
     const importer = new Importer();
     importer.debugonerror = true;
     chai.assert.doesNotThrow(() => importer.import(chesscom));
